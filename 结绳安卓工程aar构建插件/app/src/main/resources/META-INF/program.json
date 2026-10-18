@@ -1,0 +1,24 @@
+{
+  "id": "com.tiecode.aarplugin",
+  "name": "结绳安卓工程aar构建插件",
+  "engine": "plugin",
+  "description": "为结绳安卓工程(cn.tiecode.android)增加运行配置「构建aar」：复用宿主自己的编译任务，把工程打包成 aar；构建期间的编译按结绳原中文类名输出（不再随机生成 rn_）",
+  "versionCode": 6,
+  "versionName": "1.5",
+  "minSupport": 1,
+  "vendor": {
+    "name": "boboyr",
+    "email": "isboboyr@163.com",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "application",
+      "class": "com.tiecode.aarplugin.AarBuildPlugin"
+    },
+    {
+      "point": "project.component",
+      "class": "com.tiecode.aarplugin.AarProjectComponentFactory"
+    }
+  ]
+}

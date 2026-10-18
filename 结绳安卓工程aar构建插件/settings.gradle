@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "结绳安卓工程aar构建插件"

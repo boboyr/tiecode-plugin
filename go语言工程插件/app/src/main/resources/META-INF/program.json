@@ -1,0 +1,48 @@
+{
+  "id": "com.goproject.plugin",
+  "name": "go语言工程插件",
+  "engine": "plugin",
+  "description": "结绳 Go 语言工程插件（控制台插件 + SDL3工程插件合并版）：一个工程类型带「控制台工程」「SDL3工程」两个创建模板",
+  "versionCode": 4,
+  "versionName": "1.3",
+  "minSupport": 1,
+  "vendor": {
+    "name": "boboyr",
+    "email": "isboboyr@163.com",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "application",
+      "class": "com.goproject.plugin.MyApplication"
+    },
+    {
+      "point": "project.manager",
+      "class": "com.goproject.plugin.project.GoProjectManager"
+    },
+    {
+      "point": "project.language",
+      "class": "com.goproject.plugin.lang.GoLanguageFactory",
+      "scope": {
+        "unit": "project",
+        "identifiers": "sample.go"
+      }
+    },
+    {
+      "point": "domain.menu",
+      "class": "com.goproject.plugin.Gomodmenu"
+    },
+    {
+      "point": "domain.menu",
+      "class": "com.goproject.plugin.Gomodinitmenu"
+    },
+    {
+      "point": "domain.menu",
+      "class": "com.goproject.plugin.Gomodlydmenu"
+    },
+    {
+      "point": "domain.menu",
+      "class": "com.goproject.plugin.Gomodupdatemenu"
+    }
+  ]
+}

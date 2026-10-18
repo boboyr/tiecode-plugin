@@ -1,0 +1,29 @@
+{
+  "id": "com.dsh.libgdxeditor",
+  "name": "libgdx游戏引擎编辑器",
+  "engine": "plugin",
+  "description": "libgdx 游戏引擎可视化编辑器:代码编辑器长按菜单打开可视化场景编辑器(拖组件、调属性、贴图预览),自动把生成的结绳代码写回当前文件;文件树「新建文件」里增加「新建场景类」",
+  "versionCode": 2,
+  "versionName": "1.1",
+  "minSupport": 2,
+  "vendor": {
+    "name": "dsh",
+    "email": "",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "domain.menu.editor.code",
+      "class": "com.dsh.libgdxeditor.GameEditorMenu"
+    },
+    {
+      "point": "project.file.creationOption",
+      "class": "com.dsh.libgdxeditor.NewSceneClassOption",
+      "scope": {
+        "unit": "project",
+        "identifier": "cn.tiecode.android"
+      }
+    }
+  ],
+  "file": "libgdx游戏引擎编辑器-1.0.rmx"
+}

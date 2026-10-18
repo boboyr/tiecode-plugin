@@ -1,0 +1,54 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 36
+    buildToolsVersion "36.0.0"
+
+    namespace "com.goproject.plugin"
+
+    defaultConfig {
+        applicationId "com.goproject.plugin"
+        minSdkVersion 26
+        targetSdkVersion 36
+        versionCode 4
+        versionName "1.3"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            // libSDL3.so 以 STORED(未压缩) 打包：
+            // 结绳安装器用 available()+单次 read() 读取条目，压缩条目会读出零尾导致段头损坏。
+            useLegacyPackaging = false
+        }
+    }
+
+    android.applicationVariants.all {
+                variant ->
+                    variant.outputs.all {
+                        output -> output.outputFileName = "go语言工程插件-1.1" + ".rmx"
+                    }
+            }
+}
+
+dependencies {
+    // libs/*.jar 会打进插件：classes.jar(org.libsdl.app 的 SDL Java 胶水)、
+    // commons-compress + xztar(解压 gcc 工具链的 tar.xz)
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+    // libs/api/*.jar 是宿主 IDE 提供的 SDK，只在编译期可见（运行时由结绳宿主提供,不打包进插件）
+    compileOnly fileTree(dir: "libs/api", include: ["*.jar", "*.aar"])
+    // sora 官方 LSP 客户端(基于 lsp4j):打进插件,用于对接 gopls 补全
+    implementation 'io.github.rosemoe:editor-lsp:0.24.6'
+    // editor-lsp 以 implementation 引入 lsp4j,不暴露到编译类路径,这里显式补上
+    implementation 'org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0'
+}

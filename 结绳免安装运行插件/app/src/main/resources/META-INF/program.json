@@ -1,0 +1,24 @@
+{
+  "id": "com.dsh.nomount",
+  "name": "免安装运行器",
+  "engine": "plugin",
+  "description": "为结绳安卓工程(cn.tiecode.android)增加运行配置「免安装运行」：编译/打包任务全部复用宿主自己的任务链，只在最后一步把「安装并启动」换成在结绳进程内直接加载该 APK 的 dex+资源并显示其界面，全程不安装。",
+  "versionCode": 2,
+  "versionName": "0.2.0",
+  "minSupport": 1,
+  "vendor": {
+    "name": "dsh",
+    "email": "",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "application",
+      "class": "com.dsh.nomount.NoMountPlugin"
+    },
+    {
+      "point": "project.component",
+      "class": "com.dsh.nomount.NoMountComponentFactory"
+    }
+  ]
+}

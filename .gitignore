@@ -1,0 +1,14 @@
+# 构建产物
+build/
+.gradle/
+*.apk
+*.rmx
+local.properties
+
+# 大型二进制（工具链/系统库，按需自行下载）
+**/go-toolchain/*.zip
+
+# IDE
+.idea/
+*.iml
+.DS_Store
