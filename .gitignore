@@ -1,14 +1,28 @@
 # 构建产物
 build/
 .gradle/
+local.properties
 *.apk
 *.rmx
-local.properties
+*.class
+*.dex
 
-# 大型二进制（工具链/系统库，按需自行下载）
+# 二进制依赖（编译器/工具链，按需自行下载，见各插件 README）
+# 只排除 libs 下的依赖 jar，保留 gradle/wrapper/gradle-wrapper.jar
+**/libs/**/*.jar
+**/libs/**/*.aar
+*.aar
+*.so
+*.zip
+*.tlb
+*.kotlin_module
+
+# 大型工具链压缩包
 **/go-toolchain/*.zip
 
 # IDE
 .idea/
 *.iml
 .DS_Store
+
+# 说明：drawable 图标 png、截图 png 是源码/文档资产，不忽略

@@ -1,0 +1,60 @@
+package com.linux.plugin.project;
+
+import android.graphics.drawable.Drawable;
+
+import com.rapid.api.Platform;
+import com.rapid.api.project.CodeProjectManager;
+import com.rapid.api.project.TypeDescription;
+import com.rapid.util.android.ContextUtils;
+import java.io.File;
+import com.rapid.api.project.ProjectManager;
+import com.linux.plugin.template.TieDefaultTemplate;
+import com.rapid.api.framework.project.file.DefaultOpeningOption;
+import com.rapid.util.file.FileUtils;
+import com.rapid.api.project.service.LanguageManager;
+import com.rapid.framework.extension.annotation.Import;
+import com.rapid.api.Unit;
+import com.linux.plugin.lang.engine.TieLanguage;
+import com.linux.plugin.lang.engine.TieLanguageFactory;
+import com.linux.plugin.lang.engine.TieLanguageEngine;
+
+
+public class TieProjectManager extends CodeProjectManager<TieProject> {
+	
+    public static final String IDENTIFIER = "tie";
+    public static final String TYPE = "结绳Linux-SDL3工程";
+	
+    public TieProjectManager() {
+        addTemplate(new TieDefaultTemplate());
+		fileManager = new TieFileManager();
+        fileManager.enableProjectJSONFilter();
+        fileManager.addPSObjectOpeningOption(DefaultOpeningOption.INSTANCE, "t","c","cpp","h");
+		languageManager.registerEngine("tie",TieLanguageEngine.getInstance());
+		languageManager.registerLanguageFactory(new TieLanguageFactory());
+    }
+
+    public TypeDescription getTypeDescription() {
+        Drawable drawable = ContextUtils.getDrawable(Platform.getApplicationContext(), 0x7f080186);
+        return new TypeDescription(TYPE, 1, drawable);
+    }
+
+    public boolean isProjectDir(File file) {
+        return true;
+    }
+
+    public TieProject newProject() {
+        return new TieProject();
+    }
+
+    public String getIdentifier() {
+        return IDENTIFIER;
+    }
+
+	@Override
+	public void load(TieProject project, ProjectManager.LoadingPresentation presentation) {
+		//FileUtils.delete(project.getChildFile("绳包" + File.separator + "Linux基本库"));
+		super.load(project, presentation);
+	}
+	
+}
+

@@ -1,0 +1,24 @@
+{
+  "id": "com.linux.plugin",
+  "name": "结绳Linux-SDL3工程插件",
+  "engine": "plugin",
+  "description": "用于结绳Linux工程，替换结绳Linux工程编译器为最新版,并支持SDL3",
+  "versionCode": 1,
+  "versionName": "2.0",
+  "minSupport": 1,
+  "vendor": {
+    "name": "boboyr",
+    "email": "isboboyr@163.com",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "project.component",
+      "class": "com.linux.plugin.FirstTimeDialogFactory"
+    },
+    {
+      "point": "project.manager",
+      "class": "com.linux.plugin.project.TieProjectManager"
+    }
+  ]
+}

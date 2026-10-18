@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 35
+    buildToolsVersion "35.0.0"
+
+    namespace "com.linux.plugin"
+
+    defaultConfig {
+        applicationId "com.linux.plugin"
+        minSdkVersion 21
+        targetSdkVersion 35
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    
+    packagingOptions {
+        // 禁止剥离 libtiec_shared.so 的调试符号（防止节区头损坏）
+        doNotStrip "**/libtiec_shared.so"
+    }
+
+    
+    android.applicationVariants.all {
+                variant ->
+                    variant.outputs.all {
+                        output -> output.outputFileName = "结绳Linux工程SDL3插件" + ".rmx"
+                    }
+            }
+}
+
+dependencies {
+	implementation fileTree(dir: "libs", include: ["*.jar","*.aar"])
+	implementation("cn.tiecode:tiecode-compiler:4.7.0-preview8")
+    compileOnly fileTree(dir: "libs/api", include: ["*.jar"])
+}

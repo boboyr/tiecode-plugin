@@ -1,0 +1,280 @@
+package com.linux.plugin.lang.engine.completion;
+
+import com.linux.plugin.lang.engine.TiecodeLanguageContext;
+import com.linux.plugin.lang.engine.TiecodeProvider;
+
+import com.rapid.api.Platform;
+import com.rapid.api.lang.engine.CancellationToken;
+import com.rapid.api.lang.engine.completion.CompletionItem;
+import com.rapid.api.lang.engine.completion.CompletionItemKind;
+import com.rapid.api.lang.engine.completion.CompletionParams;
+import com.rapid.api.lang.engine.completion.CompletionProvider;
+import com.rapid.api.lang.engine.completion.CompletionResult;
+import com.rapid.api.lang.engine.completion.InsertTextFormat;
+import com.rapid.framework.data.document.Position;
+import com.rapid.framework.vfs.VirtualFile;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import cn.tiecode.compiler.TCIDEService;
+import cn.tiecode.compiler.foundation.TCPosition;
+import cn.tiecode.compiler.ide.TCCompletionItem;
+import cn.tiecode.compiler.ide.TCCompletionItemKind;
+import cn.tiecode.compiler.ide.TCCompletionParams;
+import cn.tiecode.compiler.ide.TCCompletionResult;
+
+/**
+ * 结绳语言补全。
+ *
+ * <p>结果由两部分组成:
+ * <ul>
+ *   <li>结绳语法关键字与代码片段,离线可用,始终参与补全;</li>
+ *   <li>基于 {@code cn.tiecode:tiecode-compiler} 的语义补全,使用
+ *       {@link TiecodeLanguageContext} 中共享的 {@link TCIDEService}
+ *       返回类、方法、变量、事件等符号。</li>
+ * </ul>
+ */
+public class TieCompletionProvider extends TiecodeProvider implements CompletionProvider {
+
+    /** 结绳保留关键字。 */
+    private static final String[] KEYWORDS = {
+            "包名", "类", "继承", "变量", "常量", "为", "本对象", "父对象", "属于", "创建",
+            "返回", "结束", "属性", "事件", "定义事件", "订阅事件", "方法", "属性读", "属性写",
+            "假如", "是", "如果", "则", "否则", "且", "或", "循环", "退出循环", "跳过循环",
+            "等待", "真", "假", "空"
+    };
+
+    /** 语法片段:{标签, 说明, 插入文本},插入文本使用 LSP Snippet 语法。 */
+    private static final String[][] SNIPPETS = {
+            {"类", "类声明", "类 ${1:类名}\n\t$0\n结束 类"},
+            {"类继承", "类声明(继承)", "类 ${1:子类}: ${2:父类}\n\t$0\n结束 类"},
+            {"方法", "方法声明", "方法 ${1:方法名}(${2})\n\t$0\n结束 方法"},
+            {"方法返回值", "方法声明(返回值)", "方法 ${1:方法名}(${2}): ${3:返回类型}\n\t$0\n结束 方法"},
+            {"属性读", "属性读声明", "属性读 ${1:名称}(): ${2:类型}\n\t$0\n结束 属性"},
+            {"属性写", "属性写声明", "属性写 ${1:名称}(${2:值}: ${3:类型})\n\t$0\n结束 属性"},
+            {"变量", "变量声明", "变量 ${1:名称}: ${2:类型} = ${3:值}"},
+            {"常量", "常量声明", "常量 ${1:名称}: ${2:类型} = ${3:值}"},
+            {"定义事件", "事件签名声明", "定义事件 ${1:事件名}(${2:参数}: ${3:类型})"},
+            {"事件", "事件处理块", "事件 ${1:对象}:${2:事件名}(${3:参数})\n\t$0\n结束 事件"},
+            {"如果", "条件语句", "如果 ${1:条件}\n\t$0\n结束 如果"},
+            {"如果否则", "条件语句(否则)", "如果 ${1:条件}\n\t$0\n否则\n\t\n结束 如果"},
+            {"假如", "多分支语句", "假如 ${1:值}\n是 ${2:值}\n\t$0\n否则\n\t\n结束 假如"},
+            {"循环计次", "计次循环", "循环(${1:i}, 0, ${2:10})\n\t$0\n结束 循环"},
+            {"循环遍历", "遍历循环", "循环(${1:列表} -> ${2:项})\n\t$0\n结束 循环"},
+            {"循环条件", "条件循环", "循环(${1:条件})\n\t$0\n结束 循环"},
+            {"返回", "返回语句", "返回 ${1:值}"},
+            {"创建", "创建对象", "创建 ${1:类型}()"}
+    };
+
+    public TieCompletionProvider(TiecodeLanguageContext context) {
+        super(context);
+    }
+
+    @Override
+    public void complete(CompletionParams params, CompletionResult result, CancellationToken token) {
+        if (params == null || result == null) {
+            return;
+        }
+        if (token != null && token.isCancellationRequested) {
+            return;
+        }
+
+        String partial = params.partial == null ? "" : params.partial;
+        Position position = params.position == null ? new Position(0, 0) : params.position;
+        Set<String> added = new HashSet<>();
+
+        // 成员访问(. 触发)只做语义补全,不插入语法关键字。
+        if (params.triggerChar != '.') {
+            addSyntaxCompletions(partial, result, added);
+        }
+        addSemanticCompletions(params, position, partial, result, added);
+    }
+
+    @Override
+    public void resolve(CompletionItem completionItem) {
+        // 插入文本已在 complete 阶段完整生成。
+    }
+
+    private void addSyntaxCompletions(String partial, CompletionResult result, Set<String> added) {
+        for (String keyword : KEYWORDS) {
+            if (!matches(keyword, partial) || !added.add("k:" + keyword)) {
+                continue;
+            }
+            CompletionItem item = new CompletionItem();
+            item.label = keyword;
+            item.kind = CompletionItemKind.Keyword;
+            item.detail = "关键字";
+            item.insertText = keyword;
+            item.insertTextFormat = InsertTextFormat.PLAINTEXT;
+            result.add(item);
+        }
+        for (String[] snippet : SNIPPETS) {
+            String label = snippet[0];
+            if (!matches(label, partial) || !added.add("s:" + label)) {
+                continue;
+            }
+            CompletionItem item = new CompletionItem();
+            item.label = label;
+            item.kind = CompletionItemKind.Snippet;
+            item.detail = snippet[1];
+            item.insertText = snippet[2];
+            item.insertTextFormat = InsertTextFormat.SNIPPET;
+            result.add(item);
+        }
+    }
+
+    private void addSemanticCompletions(CompletionParams params, Position position, String partial,
+                                        CompletionResult result, Set<String> added) {
+        TCIDEService service = context == null ? null : context.getIDEService();
+        VirtualFile virtualFile = params.virtualFile;
+        if (service == null || virtualFile == null) {
+            return;
+        }
+        try {
+            TCCompletionParams tcParams = new TCCompletionParams();
+            tcParams.uri = virtualFile.asURI();
+            tcParams.position = new TCPosition(position.line, position.character);
+            tcParams.lineText = params.lineText;
+            tcParams.partial = partial;
+            tcParams.triggerChar = params.triggerChar;
+
+            TCCompletionResult tcResult = service.complete(tcParams);
+            if (tcResult == null || tcResult.items == null) {
+                return;
+            }
+            for (TCCompletionItem item : tcResult.items) {
+                if (item == null || item.label == null || item.label.isEmpty()) {
+                    continue;
+                }
+                if (!matches(item.label, partial) || !added.add("c:" + item.label + ":" + kindName(item.kind))) {
+                    continue;
+                }
+                result.add(toCompletionItem(item));
+            }
+        } catch (Throwable t) {
+            log("结绳语义补全失败: " + t);
+        }
+    }
+
+    private CompletionItem toCompletionItem(TCCompletionItem item) {
+        CompletionItem completionItem = new CompletionItem();
+        completionItem.label = item.label;
+        completionItem.detail = item.detail != null ? item.detail : kindName(item.kind);
+        completionItem.kind = toStudioKind(item.kind);
+        completionItem.sortText = item.sortKey;
+        completionItem.symbolName = item.symbolName;
+        // 关键:宿主(编辑器)应用补全项时只读取 insertText,且为 null 时会直接返回、
+        // 不写入任何文本,表现为"选中补全项后只剩已输入的前缀"。因此这里必须给出非空插入文本;
+        // 编译器未提供 insertText 时按符号类型回退(方法补空括号,其余用名称)。
+        String insert = item.insertText;
+        if (insert == null || insert.isEmpty()) {
+            insert = fallbackInsertText(item);
+        }
+        completionItem.insertText = insert;
+        completionItem.insertTextFormat = InsertTextFormat.PLAINTEXT;
+        return completionItem;
+    }
+
+    /**
+     * 编译器未给出 insertText 时,由 label / symbolName 回退出可插入文本。
+     *
+     * <p>方法类符号补全后带上空括号(如 {@code 绘制一帧()}),便于直接调用;
+     * 其余符号(变量、类、属性等)只插入名称本身。
+     */
+    private String fallbackInsertText(TCCompletionItem item) {
+        String base = item.label;
+        if (base == null || base.isEmpty()) {
+            base = item.symbolName;
+        }
+        if (base == null || base.isEmpty()) {
+            return "";
+        }
+        if (item.kind == TCCompletionItemKind.COMMON_METHOD) {
+            int paren = base.indexOf('(');
+            if (paren > 0) {
+                base = base.substring(0, paren);
+            }
+            return base + "()";
+        }
+        return base;
+    }
+
+    /** 前缀匹配:partial 为空时全部命中,否则不区分大小写的包含匹配。 */
+    private boolean matches(String label, String partial) {
+        if (partial == null || partial.isEmpty()) {
+            return true;
+        }
+        return label != null && label.toLowerCase().contains(partial.toLowerCase());
+    }
+
+    private int toStudioKind(TCCompletionItemKind kind) {
+        if (kind == null) {
+            return CompletionItemKind.Text;
+        }
+        switch (kind) {
+            case KEYWORD:
+                return CompletionItemKind.Keyword;
+            case SNIPPET:
+                return CompletionItemKind.Snippet;
+            case CLASS:
+                return CompletionItemKind.Class;
+            case VARIABLE:
+                return CompletionItemKind.Variable;
+            case COMMON_METHOD:
+                return CompletionItemKind.Method;
+            case GETTER:
+            case SETTER:
+                return CompletionItemKind.Property;
+            case EVENT_DECLARE:
+                return CompletionItemKind.Event;
+            case ANNOTATION:
+                return CompletionItemKind.Reference;
+            case LITERAL:
+                return CompletionItemKind.Value;
+            case FILE:
+                return CompletionItemKind.File;
+            default:
+                return CompletionItemKind.Text;
+        }
+    }
+
+    private String kindName(TCCompletionItemKind kind) {
+        if (kind == null) {
+            return "符号";
+        }
+        switch (kind) {
+            case KEYWORD:
+                return "关键字";
+            case SNIPPET:
+                return "代码片段";
+            case CLASS:
+                return "类";
+            case VARIABLE:
+                return "变量";
+            case COMMON_METHOD:
+                return "方法";
+            case GETTER:
+                return "属性读";
+            case SETTER:
+                return "属性写";
+            case EVENT_DECLARE:
+                return "事件";
+            case ANNOTATION:
+                return "注解";
+            case LITERAL:
+                return "字面量";
+            case FILE:
+                return "文件";
+            default:
+                return "符号";
+        }
+    }
+
+    private void log(String message) {
+        try {
+            Platform.getLogger().info("[TieCompletion] " + message);
+        } catch (Throwable ignore) {
+        }
+    }
+}

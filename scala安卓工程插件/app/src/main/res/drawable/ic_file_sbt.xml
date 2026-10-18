@@ -1,0 +1,25 @@
+<!--
+  .sbt 文件图标：与 ic_file_scala 同一套"纸 + 徽章"，徽章用石板蓝灰，
+  表示"构建脚本"而不是源码，图形仍是 Scala 阶梯螺旋。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+  <path
+      android:pathData="M294.6,733.5h434.8v29.1H294.6zM294.6,661.1h434.8v29.1H294.6zM294.6,588.7h434.8v29.1H294.6z"
+      android:fillColor="#9FA0A6" />
+  <path
+      android:pathData="M787.8,225h176.5v728.1c0,37.6 -28.6,66.2 -66.2,66.2L192.2,1019.3c-37.6,0 -66.2,-28.6 -66.2,-66.2L126,70.9c0,-37.6 28.6,-66.2 66.2,-66.2h551.6v176.5h44L787.8,225zM721.9,202.8L721.9,26.3L192.2,26.3c-24.4,0 -44.3,19.9 -44.3,44.3v882.3c0,24.4 19.9,44.3 44.3,44.3L898,997.2c24.4,0 44.3,-19.9 44.3,-44.3L942.3,247L765.8,247v-44.3c0,0.1 -43.9,0.1 -43.9,0.1z"
+      android:fillColor="#9FA0A6" />
+  <path
+      android:pathData="M104,114.5h352.9c24.4,0 44.3,19.9 44.3,44.3v352.9c0,24.4 -19.9,44.3 -44.3,44.3H104c-24.4,0 -44.3,-19.9 -44.3,-44.3V158.8c0.3,-24.4 20.2,-44.3 44.3,-44.3z"
+      android:fillColor="#34495E" />
+  <path
+      android:pathData="M409,162L151,162L151,420L409,420L409,248L237,248L237,334L323,334"
+      android:strokeColor="#FFFFFF"
+      android:strokeWidth="40"
+      android:strokeLineCap="butt"
+      android:strokeLineJoin="miter" />
+</vector>

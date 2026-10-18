@@ -1,0 +1,39 @@
+{
+  "id": "com.tiecode.ktcplugin",
+  "name": "外部kotlin文件注解插件",
+  "engine": "plugin",
+  "description": "用于导入并编译外部kotlin文件，并为 .kt/.kts 文件提供 Kotlin 语法高亮、代码补全（含自动导包）与文件图标",
+  "versionCode": 3,
+  "versionName": "1.2",
+  "minSupport": 1,
+  "vendor": {
+    "name": "boboyr",
+    "email": "isboboyr@163.com",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "application",
+      "class": "com.tiecode.ktcplugin.TiecodeApp"
+    },
+    {
+      "point": "project.component",
+      "class": "com.tiecode.ktcplugin.FirstTimeDialogFactory"
+    },
+    {
+      "point": "project.file.creationOption",
+      "class": "com.tiecode.ktcplugin.lang.kt.KotlinClassCreationOption"
+    },
+    {
+      "point": "project.event.fileUi",
+      "class": "com.tiecode.ktcplugin.lang.kt.KotlinFileUiEvent"
+    },
+    {
+      "point": "project.file.openWithEditor",
+      "fileTypes": [
+        "kt",
+        "kts"
+      ]
+    }
+  ]
+}

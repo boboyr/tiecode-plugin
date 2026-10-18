@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "外部kotlin文件注解插件"

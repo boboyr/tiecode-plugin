@@ -1,0 +1,20 @@
+{
+  "id": "${package_name}",
+  "name": "${app_name}",
+  "engine": "plugin",
+  "description": "${plugin_note}",
+  "versionCode": ${version_code},
+  "versionName": "${version_name}",
+  "minSupport": 1,
+  "vendor": {
+    "name": "boboyr",
+    "email": "isboboyr@163.com",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "domain.menu",
+      "class": "${plugin_class}"
+    }
+  ]
+}

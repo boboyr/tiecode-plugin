@@ -1,0 +1,20 @@
+<!--
+  「Scala 安卓工程」工程图标 / 新建工程模板图片：
+  Scala 红圆角方 + 白色方形阶梯螺旋（Scala 标志图形）。
+  用在 TypeDescription（工程列表）与 Template.getPicture()（新建工程对话框）。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+  <path
+      android:pathData="M232,0h560c128.1,0 232,103.9 232,232v560c0,128.1 -103.9,232 -232,232H232C103.9,1024 0,920.1 0,792V232C0,103.9 103.9,0 232,0z"
+      android:fillColor="#DC322F" />
+  <path
+      android:pathData="M812,212L212,212L212,812L812,812L812,412L412,412L412,612L612,612"
+      android:strokeColor="#FFFFFF"
+      android:strokeWidth="68"
+      android:strokeLineCap="butt"
+      android:strokeLineJoin="miter" />
+</vector>

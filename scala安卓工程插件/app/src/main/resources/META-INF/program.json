@@ -1,0 +1,28 @@
+{
+  "id": "com.scala.android",
+  "name": "scala安卓工程插件",
+  "engine": "plugin",
+  "description": "为结绳新增「Scala安卓工程」：工程结构同 scala-android-app-modern（build.sbt + src/main/scala|res|AndroidManifest.xml），插件自带 sbt 构建脚本解析器（解析 build.sbt / project/*.sbt、依赖与仓库），并按结绳本体的写法用宿主工具链完成「aapt2 资源 → 合并清单 → 链接资源 → 编译R类 → 编译 Scala/Java → D8 → 生成/签名/对齐 APK」全流程；同时提供 Scala 代码补全（含 sbt 依赖自动导入）；「结绳插件工程」模板 + 「构建结绳插件」/「调试结绳插件」运行配置：一键生成 .rmx 结绳插件工程，构建 rmx 产物，安装到结绳宿主 Programs 目录并重启加载",
+  "versionCode": 15,
+  "versionName": "1.14",
+  "minSupport": 1,
+  "vendor": {
+    "name": "boboyr",
+    "email": "isboboyr@163.com",
+    "url": "#"
+  },
+  "extension": [
+    {
+      "point": "application",
+      "class": "com.scala.android.ScalaAndroidPlugin"
+    },
+    {
+      "point": "project.manager",
+      "class": "com.scala.android.androidproject.ScalaAndroidProjectManager"
+    },
+    {
+      "point": "platform.settingsBuilder",
+      "class": "com.scala.android.setting.ScalaAndroidSettingsBuilder"
+    }
+  ]
+}

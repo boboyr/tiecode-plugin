@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Scala Android Modern</string>
+    <string name="hello_text">Hello from Scala 3 + sbt 2!</string>
+    <string name="button_text">Tap me</string>
+</resources>

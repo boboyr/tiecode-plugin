@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 35
+    buildToolsVersion "35.0.0"
+	
+    namespace "com.tiecode.ktcplugin"
+	
+    defaultConfig {
+        applicationId "com.tiecode.ktcplugin"
+        minSdkVersion 26
+        targetSdkVersion 35
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+	
+	compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    android.applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                output -> output.outputFileName = "外部kotlin文件注解插件-4.6-betat3" + ".rmx"
+            }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+	compileOnly fileTree(dir: '../libs', include: '*.jar')
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0"
+}
